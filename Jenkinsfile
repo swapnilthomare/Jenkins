@@ -22,6 +22,12 @@ stage ('Test'){
 			echo "test pull my code"
 		}
 }
+stage ('Deploy to prod'){
+	 steps {
+			echo "hello"
+}	
+
+}
 
 }
 }
