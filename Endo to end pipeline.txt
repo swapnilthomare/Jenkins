@@ -1,0 +1,97 @@
+pipeline{
+    
+    agent {
+        label "Build"
+    }
+    
+    stages{
+        stage('SCM'){
+            
+            steps{
+                
+                echo " i am in SCM stage ......"
+                git 'https://github.com/vimallinuxworld13/jenkins-docker-maven-java-webapp.git'
+            }
+            
+        }
+        
+        stage('Build by Maven Package'){
+            
+            steps{
+                
+                echo "i am in  maven stage......"
+                
+                
+                //sh 'mvn clean package'
+            }
+            
+        }
+        stage('Build Docker OWN image'){
+            
+            steps{
+                
+                echo "i am in  Docker Build stage......"
+                
+                
+                //sh "sudo docker build -t swapnilDockerID/hellotestimage1:${BUILD_TAG}  ."
+               
+            }
+            
+        }
+        stage('Push Image to Docker HUB'){
+            
+            steps{
+                
+                echo "i am in  Docke rHub  Build stage......"
+                
+                
+                withCredentials([string(credentialsId: 'DOCKER_HUB_PWD', variable: 'DOCKER__HUB_PWD')]) {
+    // some block
+    //sh "docker login -u vimal13 -p 1245"
+}
+                
+                
+                
+        
+                //sh "docker push swapnilDockerID/hellotestimage1:${BUILD_TAG}"
+               
+            }
+            
+        }
+    }
+        
+        stage('Deploy weAPP in DEV Env'){
+            
+            steps{
+                
+                echo "i am in  Docker Build stage......"
+                
+                sh"sudo docker rm -f myjavaap"
+                
+                
+                sh "sudo docker run -d -p 8080:8080  --name myjavapp2 docker pull vimal13/javaweb"
+               // sh "sudo docker run -d -p 8080:8080  --name myjavapp swapnilDockerID/hellotestimage1:${BUILD_TAG}"
+            }
+            stage('Deploy weAPP in QA Env'){
+            
+            steps{
+                
+                echo "QA ENV"
+                
+                sshagent(['65.0.204.225']) {
+    // some block
+    
+    sh "ssh -o  SstrictHostKeyChecking=no  ec2-user@65.0.204.255   date  "
+    
+    sh "ssh ec2-user@65.0.204.255  sudo docker run -d -p 8080:8080  --name myjavapp2 docker pull vimal13/javaweb"
+    
+    
+}
+
+}            }
+        
+    }
+    
+    
+    
+}
